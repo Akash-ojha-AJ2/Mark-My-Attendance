@@ -51,29 +51,36 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Check if teacher exists in the database
     const teacher = await Teacher.findOne({ email });
 
     if (!teacher) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
+    // Compare password with stored hashed password
     const isMatch = await bcrypt.compare(password, teacher.password);
 
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    // Store the teacher's ID in session
+    // Store teacher ID in session after successful login
     req.session.teacherId = teacher._id;
 
-    console.log("Session after login:", req.session);  // Log session here to check if teacherId is set
+    console.log("Session after login:", req.session);  // Log session to verify teacherId is set
 
-    res.status(200).json({ message: 'Login successful', teacherId: teacher._id });
+    // Send success response with teacher ID and message
+    res.status(200).json({
+      message: 'Login successful',
+      teacherId: teacher._id
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+
 
 
 const logout = (req, res) => {
