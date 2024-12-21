@@ -58,7 +58,16 @@ const login = async (req, res) => {
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ teacherId: teacher._id }, process.env.SECRET, { expiresIn: '1h' });
-    res.json({ teacherId: teacher._id, token });
+
+    // Set the token as an HTTP-only cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Secure only in production
+      maxAge: 3600000, // 1 hour
+      sameSite: 'Strict', // Prevent CSRF
+    });
+
+    res.json({ teacherId: teacher._id, message: 'Login successful' });
   } catch (err) {
     res.status(500).json({ message: 'Error during login' });
   }
@@ -66,15 +75,15 @@ const login = async (req, res) => {
 
 
 
+
 const logout = (req, res) => {
   req.session.destroy((err) => {
-      if (err) {
-          console.error('Error logging out:', err);
-          return res.status(500).send('Logout failed');
-      }
-      res.clearCookie('connect.sid'); // Clear session cookie
-      res.send('Logout successful');
-      console.log("'Logout successful'")
+    if (err) {
+      console.error('Error during session destroy:', err);
+      return res.status(500).send('Logout failed');
+    }
+    res.clearCookie('token'); // Clear the JWT token cookie
+    res.json({ message: 'Logout successful' });
   });
 };
 
