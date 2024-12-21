@@ -38,7 +38,7 @@ app.use(session({
 
 // CORS configuration
 const corsOptions = {
-  origin: "http://localhost:5173", // Frontend URL
+  origin: 'https://frontend1-pq6z.onrender.com', // Frontend URL
   methods: "GET, POST, PUT, DELETE, PATCH",
   credentials: true,
 };
