@@ -5,21 +5,17 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) return res.status(401).json({ message: 'Token missing or invalid' });
 
-  if (!authHeader) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
+  jwt.verify(token, process.env.SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: 'Invalid or expired token' });
 
-  const token = authHeader.split(' ')[1]; // Extract token from "Bearer <token>"
-
-  try {
-    const decoded = jwt.verify(token, process.env.SECRET); // Verify token
-    req.teacherId = decoded.teacherId; // Attach teacherId to request
-    next(); // Continue to next middleware or route
-  } catch (err) {
-    return res.status(401).json({ message: 'Invalid token' });
-  }
+    req.user = user; // Attach user info to the request
+    next();
+  });
 };
 
 module.exports = authMiddleware;
