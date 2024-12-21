@@ -65,13 +65,6 @@ const login = async (req, res) => {
 };
 
 
-
-(req, res) => {
-  res.clearCookie('token'); // Clear token cookie
-  res.clearCookie('teacherId'); // Clear other related cookies
-  res.status(200).send({ message: 'Logged out successfully' });
-});
-// In the routess controller
 const profile = async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.session.teacherId);
