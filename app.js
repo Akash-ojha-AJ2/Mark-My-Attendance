@@ -15,23 +15,15 @@ const MongoStore = require('connect-mongo');
 
 
 
-const session = require('express-session'); 
+
 const cookieParser = require("cookie-parser");
 
 
 
-
+app.use(express.json()); 
 app.use(cookieParser());
 
-app.use(session({
-  secret: process.env.SECRET,  // Secret for signing the session ID cookie
-  resave: false,               // Don't save the session if it wasn't modified
-  saveUninitialized: false,    // Don't save an uninitialized session
-  store: MongoStore.create({ mongoUrl: process.env.ATLASDB_URL }),
-  cookie: {
-    secure: false,             // Set to true only if using HTTPS
-  }
-}));
+
 
 // CORS configuration
 const corsOptions = {
@@ -42,7 +34,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(express.json()); // Built-in body parser
+// Built-in body parser
 
 // Routes
 app.use('/api/teachers', teacherRoutes);
