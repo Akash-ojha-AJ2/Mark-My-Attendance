@@ -15,4 +15,4 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = authenticateTeacher;
+module.exports = authMiddleware;
