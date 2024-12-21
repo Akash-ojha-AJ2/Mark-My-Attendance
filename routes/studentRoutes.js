@@ -1,21 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const student = require('../controllers/student-controller');
+const authMiddleware = require('../middleware/authenticateTeacher.js.js');
 
-// Session-based authentication middleware
-const checkTeacherAuth = (req, res, next) => {
-  console.log('Session:', req.session);
-  if (!req.session.teacherId) {
-    return res.status(401).json({ message: "Teacher not authenticated" });
-  }
-  next(); // Proceed to the next middleware/route if authenticated
-};
 
-// Apply authentication middleware to all routes in this router
-router.use(checkTeacherAuth);
 
 // Routes for adding and managing students
-router.route("/addstudent").post(student.addStudent);
+router.route("/addstudent").post(authMiddleware,student.addStudent);
 router.route("/viewstudentdataform").post(student.viewstudentdataform);
 router.route("/attendancedataform").post(student.attendancedataform);
 router.route('/attendancedataform/:branch/:semester').get(student.attendancedataform);
