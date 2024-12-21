@@ -37,6 +37,7 @@ app.use(session({
 const corsOptions = {
   origin: 'https://frontend1-pq6z.onrender.com', // Frontend URL
   methods: "GET, POST, PUT, DELETE, PATCH",
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
 app.use(cors(corsOptions));
