@@ -4,39 +4,37 @@ const Attendance = require('../models/Attendance.model');
 
 
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const formData = {
-    studentName,
-    email,
-    phoneNo,
-    rollNo,
-    branch,
-    semester,
-  };
-
+const addStudent = async (req, res) => {
   try {
-    const response = await fetch('https://attendance-v2dt.onrender.com/api/student/addstudent', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`, // Include the token
-      },
-      body: JSON.stringify(formData),
+    const teacherId = req.user?.teacherId; // Use teacherId from req.user
+    if (!teacherId) {
+      return res.status(401).json({ message: 'Teacher not authenticated' });
+    }
+
+    const { studentName, email, phoneNo, rollNo, branch, semester } = req.body;
+
+    if (!studentName || !email || !rollNo || !branch || !semester) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const newStudent = new Student({
+      studentName,
+      email,
+      phoneNo,
+      rollNo,
+      branch,
+      semester,
+      teacherId,
     });
 
-    const data = await response.json();
-
-    if (response.ok) {
-      console.log('Success:', data);
-    } else {
-      console.error('Error Response:', data);
-    }
+    await newStudent.save();
+    res.status(201).json({ message: 'Student added successfully', student: newStudent });
   } catch (error) {
-    console.error('Network error:', error);
+    console.error('Error in addStudent:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 
 
