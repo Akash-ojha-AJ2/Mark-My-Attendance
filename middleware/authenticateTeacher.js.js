@@ -5,21 +5,23 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Extract token
+  const token = req.cookies.token; // Assuming the token is stored in cookies
 
   if (!token) {
-    return res.status(401).json({ message: 'Token missing or invalid' });
+    return res.status(401).json({ message: 'Token not provided' });
   }
 
-  try {
-    const decoded = jwt.verify(token, process.env.SECRET); // Verify token
-    req.user = { teacherId: decoded.teacherId }; // Attach teacherId to req.user
+  jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    if (err) {
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Token expired, please log in again' });
+      }
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    req.teacherId = decoded.teacherId; // Attach decoded teacherId to the request
     next();
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return res.status(403).json({ message: 'Invalid or expired token' });
-  }
+  });
 };
 
 module.exports = authMiddleware;
