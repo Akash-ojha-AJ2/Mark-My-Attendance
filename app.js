@@ -11,6 +11,7 @@ const teacherRoutes = require('./routes/teacherRoutes');
 const studentRoutes = require('./routes/studentRoutes'); 
 const errorMiddleware = require("./middleware/error-middleware.js");
 const path = require('path');
+const MongoStore = require('connect-mongo');
 
 
 
@@ -76,3 +77,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
