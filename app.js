@@ -26,6 +26,7 @@ app.use(session({
   secret: process.env.SECRET,  // Secret for signing the session ID cookie
   resave: false,               // Don't save the session if it wasn't modified
   saveUninitialized: false,    // Don't save an uninitialized session
+  store: MongoStore.create({ mongoUrl: process.env.ATLASDB_URL }),
   cookie: {
     secure: false,             // Set to true only if using HTTPS
     httpOnly: true,            // Cookie cannot be accessed by JavaScript (client-side)
