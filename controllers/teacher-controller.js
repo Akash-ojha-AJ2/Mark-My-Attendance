@@ -65,6 +65,13 @@ const login = async (req, res) => {
 };
 
 
+const logout = async(req, res) => {
+  res.clearCookie('token'); // Clear token cookie
+  res.clearCookie('teacherId'); // Clear other related cookies
+  res.status(200).send({ message: 'Logged out successfully' });
+});
+
+
 const profile = async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.session.teacherId);
