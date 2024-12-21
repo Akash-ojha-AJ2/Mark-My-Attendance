@@ -66,17 +66,11 @@ const login = async (req, res) => {
 
 
 
-const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('Error during session destroy:', err);
-      return res.status(500).send('Logout failed');
-    }
-    res.clearCookie('token'); // Clear the JWT token cookie
-    res.json({ message: 'Logout successful' });
-  });
-};
-
+(req, res) => {
+  res.clearCookie('token'); // Clear token cookie
+  res.clearCookie('teacherId'); // Clear other related cookies
+  res.status(200).send({ message: 'Logged out successfully' });
+});
 // In the routess controller
 const profile = async (req, res) => {
   try {
