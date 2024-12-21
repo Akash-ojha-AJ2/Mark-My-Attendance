@@ -30,9 +30,6 @@ app.use(session({
   store: MongoStore.create({ mongoUrl: process.env.ATLASDB_URL }),
   cookie: {
     secure: false,             // Set to true only if using HTTPS
-    httpOnly: true,            // Cookie cannot be accessed by JavaScript (client-side)
-    maxAge: 1000 * 60 * 60 * 24,  // Session expiration (1 day)
-    sameSite: 'strict',        // Helps prevent CSRF attacks
   }
 }));
 
