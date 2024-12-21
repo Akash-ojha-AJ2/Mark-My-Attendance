@@ -57,7 +57,7 @@ const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, teacher.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ teacherId: teacher._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ teacherId: teacher._id }, process.env.SECRET, { expiresIn: '1h' });
     res.json({ teacherId: teacher._id, token });
   } catch (err) {
     res.status(500).json({ message: 'Error during login' });
