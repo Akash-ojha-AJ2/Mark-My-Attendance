@@ -6,21 +6,22 @@ const Attendance = require('../models/Attendance.model');
 
 const addStudent = async (req, res) => {
   try {
-    // Check if the teacherId exists in session
-    const teacherId = req.session.teacherId;
-
+    const teacherId = req.session.teacherId || req.user?.teacherId; // Ensure teacherId is available
     if (!teacherId) {
       return res.status(401).json({ message: 'Teacher not authenticated' });
     }
 
     const { studentName, email, phoneNo, rollNo, branch, semester } = req.body;
 
+    if (!studentName || !email || !rollNo) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
     const teacher = await Teacher.findById(teacherId);
     if (!teacher) {
       return res.status(404).json({ message: 'Teacher not found' });
     }
 
-    // Proceed with adding the student
     const newStudent = new Student({
       studentName,
       email,
@@ -34,10 +35,11 @@ const addStudent = async (req, res) => {
     await newStudent.save();
     res.status(201).json({ message: 'Student added successfully', student: newStudent });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error in addStudent:', error); // Log the detailed error
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 
 
