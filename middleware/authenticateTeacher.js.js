@@ -4,20 +4,14 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config();
 
-
-const authenticateTeacher = (req, res, next) => {
-  const token = req.headers['authorization'];
-
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided, please log in.' });
-  }
-
+const authMiddleware = (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);  // Replace with your secret
-    req.teacherId = decoded.teacherId;  // Attach teacherId to the request object
+    const token = req.headers.authorization.split(' ')[1]; // Extract token
+    const decoded = jwt.verify(token, process.env.SECRET);
+    req.teacherId = decoded.teacherId; // Attach teacherId to request
     next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
+  } catch (error) {
+    res.status(401).json({ message: "Unauthorized" });
   }
 };
 
