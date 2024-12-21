@@ -48,36 +48,19 @@ const register = async (req, res, next) => {
 };
 
 const login = async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const { email, password } = req.body;
-
-    // Check if teacher exists in the database
     const teacher = await Teacher.findOne({ email });
+    if (!teacher) return res.status(401).json({ message: 'Invalid credentials' });
 
-    if (!teacher) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
-
-    // Compare password with stored hashed password
     const isMatch = await bcrypt.compare(password, teacher.password);
+    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
-
-    // Store teacher ID in session after successful login
-    req.session.teacherId = teacher._id;
-
-    console.log("Session after login:", req.session);  // Log session to verify teacherId is set
-
-    // Send success response with teacher ID and message
-    res.status(200).json({
-      message: 'Login successful',
-      teacherId: teacher._id
-    });
+    const token = jwt.sign({ teacherId: teacher._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ teacherId: teacher._id, token });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    res.status(500).json({ message: 'Error during login' });
   }
 };
 
