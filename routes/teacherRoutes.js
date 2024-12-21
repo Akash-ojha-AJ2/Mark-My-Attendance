@@ -6,7 +6,7 @@ const validate = require("../middleware/validate-middleware");
 const registerSchema = require("../validators/teacherValidator");
 
 
-router.route('/logout').post(routess.logout);
+
   
 
 
