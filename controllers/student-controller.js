@@ -38,25 +38,29 @@ const addStudent = async (req, res) => {
 
 
 
-
 const viewstudentdataform = async (req, res) => {
   try {
+    const teacherId = req.user?.teacherId; // Get teacherId from req.user
+    if (!teacherId) {
+      return res.status(401).json({ message: 'Teacher not authenticated' });
+    }
+
     const { branch, semester } = req.body;
+
+    if (!branch || !semester) {
+      return res.status(400).json({ message: 'Branch and Semester are required' });
+    }
 
     // Fetch students for the specified branch, semester, and authenticated teacher
     let students = await Student.find({
       branch,
       semester,
-      teacherId: req.session.teacherId, // Assuming teacherId is stored in the session
-    }).sort({ rollNo: 1 }); // Sorts students by rollNo in ascending order
-    
+      teacherId, // Ensure students are only fetched for this teacher
+    }).sort({ rollNo: 1 });
 
     if (!students.length) {
       return res.status(404).json({ message: 'No students found for the selected branch and semester.' });
     }
-
-    // Sort students by Roll No in ascending order
-    students = students.sort((a, b) => a.rollNo - b.rollNo);
 
     // Fetch attendance records for these students
     const attendanceRecords = await Attendance.find({
@@ -107,13 +111,14 @@ const viewstudentdataform = async (req, res) => {
       attendanceMap,
       totalAttendanceMap,
       branch,
-      semester
+      semester,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error in viewstudentdataform:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 
 
